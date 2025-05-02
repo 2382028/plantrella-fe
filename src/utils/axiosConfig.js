@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:3000/api', // Sesuaikan dengan port backend
+  baseURL: 'https://simple-social-media-app-be-a1dw.vercel.app/api', // <<< URL backend Vercel
   timeout: 5000,
   headers: {
     'Content-Type': 'application/json'

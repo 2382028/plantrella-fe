@@ -4,13 +4,13 @@
 }
 
 .main-header {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   padding: 16px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .app-title {
@@ -36,7 +36,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background-color: #E8F5E9;
+  background-color: #e8f5e9;
   border: 2px solid white;
 }
 
@@ -71,19 +71,19 @@
 }
 
 .add-location {
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
 }
 
 .add-plant {
-  background-color: #FF4081;
+  background-color: #ff4081;
   color: white;
 }
 
 .add-location:hover,
 .add-plant:hover {
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .dashboard-stats {
@@ -98,7 +98,7 @@
   padding: 24px;
   border-radius: 12px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
 }
@@ -106,7 +106,7 @@
 .stat-number {
   font-size: 36px;
   font-weight: bold;
-  color: #4CAF50;
+  color: #4caf50;
   margin-bottom: 8px;
   order: 1;
 }
@@ -127,7 +127,7 @@
   background: white;
   padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .activity-list {
@@ -152,7 +152,7 @@
 .activity-time {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #4CAF50;
+  color: #4caf50;
   min-width: 80px;
 }
 
@@ -187,7 +187,7 @@
 
 .bar {
   width: 100%;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   border-radius: 4px 4px 0 0;
   transition: height 0.3s ease;
 }
@@ -233,7 +233,7 @@
 .placeholder-chart {
   width: 100%;
   height: 100%;
-  background: #F5F5F5;
+  background: #f5f5f5;
   border-radius: 8px;
 }
 
@@ -293,7 +293,8 @@
   gap: 20px;
 }
 
-.plant-card, .plant-reminder-card {
+.plant-card,
+.plant-reminder-card {
   background: #f8f9fa;
   padding: 16px;
   border-radius: 8px;
@@ -334,4 +335,57 @@
   background: #ffebee;
   border-radius: 8px;
   margin: 20px;
+}
+
+.dashboard {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard h1 {
+  color: #4a7c59;
+  margin-bottom: 30px;
+}
+
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.stat-card h2 {
+  color: #333;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #4a7c59;
+  margin: 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 20px;
+  color: #dc3545;
+  background-color: #f8d7da;
+  border-radius: 4px;
+  margin: 20px 0;
 }

@@ -1,48 +1,74 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
+import "./LocationForm.css";
 
-function LocationForm({ location, onSave, onCancel }) {
+function LocationForm({
+  onSubmit,
+  onCancel,
+  initialData = {},
+  isLoading = false,
+}) {
   const [formData, setFormData] = useState({
-    name: '',
-    notes: ''
+    name: "",
+    notes: "",
   });
 
   useEffect(() => {
-    if (location) {
+    if (initialData) {
       setFormData({
-        name: location.name || '',
-        notes: location.notes || ''
+        name: initialData.name || "",
+        notes: initialData.notes || "",
       });
     }
-  }, [location]);
+  }, [initialData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(formData);
+    onSubmit(formData);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="location-form">
+    <form className="location-form" onSubmit={handleSubmit}>
+      <h2>{initialData.id ? "Edit Lokasi" : "Tambah Lokasi Baru"}</h2>
+
       <div className="form-group">
-        <label htmlFor="name">Nama Lokasi</label>
+        <label htmlFor="name">Nama Lokasi *</label>
         <input
           type="text"
           id="name"
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
           required
+          disabled={isLoading}
         />
       </div>
+
       <div className="form-group">
         <label htmlFor="notes">Catatan</label>
         <textarea
           id="notes"
           value={formData.notes}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+          disabled={isLoading}
+          rows="3"
         />
       </div>
+
       <div className="form-actions">
-        <button type="submit" className="btn-primary">Simpan</button>
-        <button type="button" onClick={onCancel} className="btn-secondary">Batal</button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="btn-cancel"
+          disabled={isLoading}
+        >
+          Batal
+        </button>
+        <button type="submit" className="btn-submit" disabled={isLoading}>
+          {isLoading
+            ? "Menyimpan..."
+            : initialData.id
+            ? "Simpan Perubahan"
+            : "Tambah Lokasi"}
+        </button>
       </div>
     </form>
   );

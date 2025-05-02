@@ -1,30 +1,52 @@
-import React, { useState, useEffect } from 'react';
-// Hapus baris ini: import { useNavigate } from 'react-router-dom';
-import { getAllPlants, createPlant, updatePlant, deletePlant } from '../services/plantService';
-import PlantCard from '../components/PlantCard';
-import PlantForm from '../components/PlantForm';
-import Modal from '../components/Modal';
-import './PlantsPage.css';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  getAllPlants,
+  createPlant,
+  updatePlant,
+  deletePlant,
+} from "../services/plantService";
+import { getAllLocations } from "../services/locationService";
+import PlantCard from "../components/PlantCard";
+import PlantForm from "../components/PlantForm";
+import Modal from "../components/Modal";
+import "../styles/global.css";
 
 function PlantsPage() {
+  const navigate = useNavigate();
   const [plants, setPlants] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [editingPlant, setEditingPlant] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchPlants();
+    fetchLocations();
   }, []);
 
-  const fetchPlants = async () => {
+  const fetchLocations = async () => {
     try {
-      setLoading(true);
-      const response = await getAllPlants();
-      setPlants(Array.isArray(response.data) ? response.data : []);
+      const locationsData = await getAllLocations();
+      setLocations(Array.isArray(locationsData.data) ? locationsData.data : []);
+      console.log("locationsData ==>", locationsData.data.data);
     } catch (err) {
-      setError('Gagal memuat data tanaman');
-      console.error(err);
+      console.error("Gagal memuat data lokasi:", err);
+    }
+  };
+
+  const fetchPlants = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const plantsData = await getAllPlants();
+      setPlants(Array.isArray(plantsData) ? plantsData : []);
+    } catch (err) {
+      console.error("Error fetching plants:", err);
+      setError("Gagal memuat data tanaman");
+      setPlants([]);
     } finally {
       setLoading(false);
     }
@@ -47,49 +69,62 @@ function PlantsPage() {
   };
 
   const handleSavePlant = async (plantData) => {
-    setError(null); // Reset error sebelum mencoba
+    setError(null);
+    setIsSubmitting(true);
     try {
+      const dataToSend = {
+        name: plantData.name,
+        species: plantData.species,
+        notes: plantData.notes,
+        locationId: Number(plantData.locationId)
+          ? parseInt(plantData.locationId)
+          : null,
+      };
+
       let response;
       if (editingPlant) {
-        response = await updatePlant(editingPlant.id, plantData);
-        console.log('Tanaman berhasil diperbarui:', response); // Log sukses update
+        response = await updatePlant(editingPlant.id, dataToSend);
+        console.log("Tanaman berhasil diperbarui:", response);
       } else {
-        response = await createPlant(plantData);
-        console.log('Tanaman berhasil dibuat:', response); // Log sukses create
+        response = await createPlant(dataToSend);
+        console.log("Tanaman berhasil dibuat:", response);
       }
+
       handleCloseForm();
-      fetchPlants(); // Refresh daftar tanaman
+      fetchPlants();
     } catch (err) {
-      console.error('Terjadi error saat menyimpan tanaman:', err); // Log error lengkap
-      let errorMessage = 'Gagal menyimpan tanaman.';
-      if (err.response) {
-        // Server merespons dengan status error (misal: 4xx, 5xx)
-        // Modifikasi log ini untuk menampilkan detail data respons
-        console.error('Data Respons Backend:', JSON.stringify(err.response.data, null, 2)); // Tampilkan isi objek respons
-        console.error('Status Respons Backend:', err.response.status);
-        // Coba tampilkan pesan error dari backend jika tersedia
-        errorMessage = err.response.data?.message || `Gagal menyimpan: Terjadi error di server (Status ${err.response.status})`;
-      } else if (err.request) {
-        // Request terkirim tapi tidak ada respons diterima
-        console.error('Tidak ada respons diterima:', err.request);
-        errorMessage = 'Gagal menyimpan: Tidak ada respons dari server. Periksa koneksi atau status server.';
-      } else {
-        // Error terjadi saat menyiapkan request
-        console.error('Error saat menyiapkan request:', err.message);
-        errorMessage = `Gagal menyimpan: Terjadi masalah pada request (${err.message})`;
+      console.error("Terjadi error saat menyimpan tanaman:", err);
+      let errorMessage = "Gagal menyimpan tanaman.";
+      if (err.response && err.response.data && err.response.data.message) {
+        if (Array.isArray(err.response.data.message)) {
+          errorMessage = err.response.data.message.join(", ");
+        } else {
+          errorMessage = err.response.data.message;
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
       }
-      setError(errorMessage); // Tampilkan pesan error yang lebih spesifik
+      setError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Apakah Anda yakin ingin menghapus tanaman ini?')) {
+    if (window.confirm("Apakah Anda yakin ingin menghapus tanaman ini?")) {
+      setError(null);
       try {
         await deletePlant(id);
         fetchPlants();
       } catch (err) {
-        setError('Gagal menghapus tanaman');
-        console.error(err);
+        console.error("Gagal menghapus tanaman:", err);
+        let errorMessage = "Gagal menghapus tanaman.";
+        if (err.response && err.response.data && err.response.data.message) {
+          errorMessage = err.response.data.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+        setError(errorMessage);
       }
     }
   };
@@ -97,11 +132,11 @@ function PlantsPage() {
   if (loading) return <div className="loading">Memuat data...</div>;
 
   return (
-    <div className="plants-page">
+    <div className="page-container">
       <div className="page-header">
-        <h1>Koleksi Tanaman Saya</h1>
-        <button onClick={handleOpenAddForm} className="btn-add">
-          + Tambah Tanaman
+        <h1 className="page-title">Daftar Tanaman</h1>
+        <button className="btn btn-primary" onClick={handleOpenAddForm}>
+          Tambah Tanaman
         </button>
       </div>
 
@@ -109,9 +144,11 @@ function PlantsPage() {
 
       <div className="plants-grid">
         {plants.length === 0 ? (
-          <p className="no-plants">Belum ada tanaman. Mulai tambahkan tanaman pertama Anda!</p>
+          <p className="no-plants">
+            Belum ada tanaman. Mulai tambahkan tanaman pertama Anda!
+          </p>
         ) : (
-          plants.map(plant => (
+          plants.map((plant) => (
             <PlantCard
               key={plant.id}
               plant={plant}
@@ -128,7 +165,21 @@ function PlantsPage() {
             initialData={editingPlant || {}}
             onSubmit={handleSavePlant}
             onCancel={handleCloseForm}
+            isLoading={isSubmitting}
+            apiError={error}
+            locations={locations}
           />
+          {error && !isSubmitting && (
+            <p
+              style={{
+                color: "red",
+                marginTop: "10px",
+                whiteSpace: "pre-wrap",
+              }}
+            >
+              Error: {error}
+            </p>
+          )}
         </Modal>
       )}
     </div>
